@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>スケジュールカードメーカー</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-container">
+    <header class="app-header">
+      <h1>スケジュールカードメーカー</h1>
+      <p>文字と画像を重ねるだけ。告知用カードをかんたんデザイン</p>
+    </header>
+
+    <main class="main-content">
+      <!-- プレビューエリア -->
+      <section class="preview-section">
+        <div class="preview-sticky">
+          <div class="canvas-wrapper">
+            <canvas id="schedule-canvas" width="1280" height="720"></canvas>
+            <!-- 画像の右上に重ねる虫眼鏡アイコン -->
+            <button type="button" id="zoom-open-btn" class="zoom-icon-btn" title="拡大表示">🔍</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 入力フォームエリア -->
+      <section class="form-section">
+        <!-- モード切替 -->
+        <div class="form-group">
+          <label class="section-title">1. モード選択</label>
+          <div class="radio-group">
+            <label class="radio-btn">
+              <input type="radio" name="mode" value="weekly" checked>
+              <span>週間リスト（7日分）</span>
+            </label>
+            <label class="radio-btn">
+              <input type="radio" name="mode" value="pickup">
+              <span>イベント・単発告知（自由指定）</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- デザイン・カラー設定 -->
+        <div class="form-group">
+          <label class="section-title">2. デザイン・カラー設定</label>
+          
+          <!-- プリセット保存・切り替えエリア -->
+          <div class="preset-control-box">
+            <div class="preset-main-row">
+              <select id="preset-select" class="preset-select">
+                <option value="default">初期デザイン</option>
+              </select>
+              <button type="button" id="save-preset-btn" class="preset-btn primary">💾 この端末に保存</button>
+              <button type="button" id="delete-preset-btn" class="preset-btn danger">🗑 削除</button>
+            </div>
+
+            <!-- スマホ⇄PC間のデータ移行枠 -->
+            <div class="preset-sub-row">
+              <span class="sub-label">📱 別のスマホやPCへ設定を移したい時：</span>
+              <div class="sub-btn-group">
+                <button type="button" id="export-json-btn" class="sub-btn">設定をファイルに出力</button>
+                <label class="sub-btn upload-label">
+                  ファイルを読み込む
+                  <input type="file" id="import-json-file" accept=".json" style="display:none;">
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 上段: 画像サイズ / 背景デザイン（2列のシンプルな並び） -->
+          <div class="design-select-grid">
+            <div class="input-item">
+              <label for="aspect-select">画像サイズ (アスペクト比)</label>
+              <select id="aspect-select">
+                <option value="16-9" selected>16:9（標準・YouTube）</option>
+                <option value="4-5">4:5（縦長・X）</option>
+                <option value="1-1">1:1（正方形・インスタ）</option>
+              </select>
+            </div>
+
+            <div class="input-item">
+              <label for="bg-select">背景デザイン</label>
+              <select id="bg-select">
+                <option value="cyber">サイバー / ネオン</option>
+                <option value="pop">ポップ / オレンジ</option>
+                <option value="simple">シンプル / ダーク</option>
+                <option value="custom">カスタム画像</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 中段: カスタム背景調整エリア（独立枠にして横幅いっぱいに整列） -->
+          <div id="custom-bg-wrap" class="bg-custom-panel hidden">
+            <div class="input-item">
+              <label for="bg-file">背景画像アップロード</label>
+              <input type="file" id="bg-file" accept="image/*">
+            </div>
+
+            <div class="slider-group" style="margin-top: 10px;">
+              <div class="slider-item">
+                <div class="slider-label-wrap">
+                  <label for="bg-scale">背景拡大率 (%)</label>
+                  <input type="number" id="bg-scale-num" class="num-input" min="50" max="250" value="100">
+                </div>
+                <input type="range" id="bg-scale" min="50" max="250" value="100">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-label-wrap">
+                  <label for="bg-offset-x">左右位置 (X)</label>
+                  <input type="number" id="bg-offset-x-num" class="num-input" min="-500" max="500" value="0">
+                </div>
+                <input type="range" id="bg-offset-x" min="-500" max="500" value="0">
+              </div>
+
+              <div class="slider-item">
+                <div class="slider-label-wrap">
+                  <label for="bg-offset-y">上下位置 (Y)</label>
+                  <input type="number" id="bg-offset-y-num" class="num-input" min="-500" max="500" value="0">
+                </div>
+                <input type="range" id="bg-offset-y" min="-500" max="500" value="0">
+              </div>
+            </div>
+          </div>
+
+          <!-- 下段: カラー選択（シンプルなカラーピッカー） -->
+          <div class="color-picker-grid-2x2">
+            <div class="color-control-item">
+              <label for="frame-color">枠線・メイン色</label>
+              <input type="color" id="frame-color" value="#00f3ff">
+            </div>
+
+            <div class="color-control-item">
+              <label for="card-bg-color">カード背景色</label>
+              <input type="color" id="card-bg-color" value="#111827">
+            </div>
+
+            <div class="color-control-item">
+              <label for="text-color">文字色</label>
+              <input type="color" id="text-color" value="#ffffff">
+            </div>
+
+            <div class="color-control-item">
+              <label for="accent-color">アクセント色</label>
+              <input type="color" id="accent-color" value="#ff007f">
+            </div>
+          </div>
+        </div>
+
+        <!-- キャラクター画像設定 -->
+        <div class="form-group">
+          <label class="section-title">3. 立ち絵 / ロゴ / イラスト</label>
+          <input type="file" id="char-file" accept="image/*">
+          <div class="slider-group">
+            <div class="slider-item">
+              <div class="slider-label-wrap">
+                <label for="char-scale">拡大率 (%)</label>
+                <input type="number" id="char-scale-num" class="num-input" min="50" max="200" value="100">
+              </div>
+              <input type="range" id="char-scale" min="50" max="200" value="100">
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-label-wrap">
+                <label for="char-offset-x">左右位置 (X)</label>
+                <input type="number" id="char-offset-x-num" class="num-input" min="-200" max="200" value="0">
+              </div>
+              <input type="range" id="char-offset-x" min="-200" max="200" value="0">
+            </div>
+
+            <div class="slider-item">
+              <div class="slider-label-wrap">
+                <label for="char-offset-y">上下位置 (Y)</label>
+                <input type="number" id="char-offset-y-num" class="num-input" min="-200" max="200" value="0">
+              </div>
+              <input type="range" id="char-offset-y" min="-200" max="200" value="0">
+            </div>
+          </div>
+        </div>
+
+        <!-- テキスト入力エリア -->
+        <div class="form-group">
+          <label class="section-title">4. スケジュール内容入力</label>
+          
+          <div class="input-item">
+            <label for="main-title">タイトル</label>
+            <input type="text" id="main-title" value="WEEKLY SCHEDULE">
+          </div>
+
+          <div class="input-item">
+            <label for="sub-title">サブタイトル / 日付範囲</label>
+            <input type="text" id="sub-title" value="今週の生放送スケジュール">
+          </div>
+
+          <!-- 週間モード用フォーム -->
+          <div id="weekly-inputs" class="schedule-input-container">
+            <!-- JSで月〜日の7日分フォームを生成 -->
+          </div>
+
+          <!-- ピックアップモード用フォーム（確定と未定で分離） -->
+          <div id="pickup-inputs" class="schedule-input-container hidden">
+            <!-- 1. 確定スケジュール -->
+            <div class="pickup-section-box">
+              <span class="sub-section-title">📅 確定スケジュール</span>
+              <div id="pickup-list-confirmed">
+                <!-- JSで動的に追加 -->
+              </div>
+              <button type="button" id="add-confirmed-btn" class="add-item-btn">＋ 確定予定を追加</button>
+            </div>
+
+            <!-- 2. 日時未定・準備中 -->
+            <div class="pickup-section-box undecided-box">
+              <span class="sub-section-title accent-text">❓ 日時未定・準備中・告知</span>
+              <div id="pickup-list-undecided">
+                <!-- JSで動的に追加 -->
+              </div>
+              <button type="button" id="add-undecided-btn" class="add-item-btn undecided-add-btn">＋ 未定・準備中項目を追加</button>
+            </div>
+          </div>
+
+          <div class="input-item">
+            <label for="footer-note">フッター注記</label>
+            <input type="text" id="footer-note" value="※予定は変更となる場合があります。最新情報はX（旧Twitter）にてお知らせします。">
+          </div>
+        </div>
+
+        <button id="download-btn" class="download-btn">画像をダウンロード (PNG)</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- 拡大表示用モーダル（画面中央にポップアップ） -->
+  <div id="zoom-modal" class="zoom-modal hidden">
+    <div class="zoom-modal-content">
+      <button type="button" id="zoom-close-btn" class="zoom-close-btn">✕ 閉じる</button>
+      <div class="zoom-canvas-container">
+        <img id="zoom-img" alt="プレビュー拡大">
+      </div>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+</body>
+</html>

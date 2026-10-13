@@ -1,0 +1,691 @@
+@charset "UTF-8";
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+  background-color: #0f172a;
+  color: #f8fafc;
+  line-height: 1.5;
+  padding: 16px;
+}
+
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.app-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.app-header h1 {
+  font-size: 1.5rem;
+  color: #38bdf8;
+  margin-bottom: 4px;
+}
+
+.app-header p {
+  font-size: 0.85rem;
+  color: #94a3b8;
+}
+
+/* メインレイアウト */
+.main-content {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 画面幅1024px以上のPC表示時 */
+@media (min-width: 1024px) {
+  .main-content {
+    flex-direction: row-reverse;
+  }
+  .preview-section {
+    flex: 1;
+  }
+  .form-section {
+    flex: 1;
+  }
+  .preview-sticky {
+    position: sticky;
+    top: 20px;
+    background: transparent; /* 背景カードを消去 */
+    border: none;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .preview-sticky h2 {
+    font-size: 1rem;
+    color: #38bdf8;
+    margin-bottom: 10px;
+    width: 100%;
+  }
+  .zoom-btn {
+    display: none; /* PCでは拡大ボタン非表示 */
+  }
+}
+
+/* スマホ/タブレット表示（1023px以下）のミニプレビュー */
+@media (max-width: 1023px) {
+  .preview-section {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: #0f172a;
+    padding: 10px 0 12px 0;
+    border-bottom: 2px solid #334155;
+    max-height: none;
+    display: flex;
+    justify-content: center; /* 画面の中央に配置 */
+    align-items: center;
+  }
+
+  .preview-sticky {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    background: transparent !important; /* ★外枠背景を透明化 */
+    border: none !important;            /* ★外枠線を消去 */
+    box-shadow: none !important;        /* ★影を消去 */
+    padding: 0 !important;
+  }
+
+  .preview-header-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .preview-header-mobile h2 {
+    display: none;
+  }
+
+  .zoom-btn {
+    background: #38bdf8;
+    color: #0f172a;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .canvas-wrapper {
+    max-height: 180px !important;
+	max-width: 90vw !important;
+    width: auto !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+	margin: 0 auto;
+  }
+
+  #schedule-canvas {
+    max-height: 180px !important;
+	max-width: 100% !important;
+    width: auto !important;
+	height: auto !important;
+    object-fit: contain;
+  }
+}
+
+/* フォームセクション */
+.form-section {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid #334155;
+}
+
+.section-title {
+  font-size: 1.05rem;
+  font-weight: bold;
+  color: #38bdf8;
+  margin-bottom: 10px;
+  display: block;
+  border-bottom: 2px solid #334155;
+  padding-bottom: 4px;
+}
+
+.preset-btn-group {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+/* プリセット操作ボックス */
+.preset-control-box {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.preset-main-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.preset-select {
+  flex: 1;
+  background: #1e293b;
+  color: #38bdf8;
+  border: 1px solid #38bdf8;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+}
+
+.preset-btn {
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.preset-btn.primary {
+  background: #0284c7;
+  color: #ffffff;
+  border: none;
+}
+
+.preset-btn.primary:hover {
+  background: #0369a1;
+}
+
+.preset-btn.danger {
+  background: #1e293b;
+  color: #ef4444;
+  border: 1px solid #ef4444;
+}
+
+.preset-btn.danger:hover {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.preset-sub-row {
+  border-top: 1px solid #1e293b;
+  padding-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sub-label {
+  font-size: 0.75rem;
+  color: #94a3b8;
+}
+
+.sub-btn-group {
+  display: flex;
+  gap: 8px;
+}
+
+.sub-btn {
+  flex: 1;
+  background: #1e293b;
+  color: #cbd5e1;
+  border: 1px solid #475569;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  cursor: pointer;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.sub-btn:hover {
+  background: #334155;
+  color: #ffffff;
+}
+.preset-btn:hover {
+  background: #38bdf8;
+  color: #0f172a;
+}
+
+.preset-btn.reset {
+  color: #94a3b8;
+  border-color: #475569;
+}
+
+.preset-btn.reset:hover {
+  background: #ef4444;
+  color: #ffffff;
+  border-color: #ef4444;
+}
+
+.upload-label {
+  display: inline-block;
+  cursor: pointer;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* モード選択のラジオボタンエリア（レスポンシブ対応） */
+.radio-group {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+.radio-btn {
+  flex: 1; /* PC・タブレットでは左右均等幅（50%ずつ）に広げる */
+  display: flex;
+  align-items: center;
+  justify-content: center; /* 中央寄せ */
+  gap: 8px;
+  cursor: pointer;
+  background: #0f172a;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  font-size: 0.9rem;
+  white-space: nowrap; /* ボタン内での勝手な途中改行を絶対防止 */
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.radio-btn:hover {
+  border-color: #38bdf8;
+  background: #1e293b;
+}
+
+/* スマホ表示時（767px以下）は縦並びで横幅100%の大きなボタンにする */
+@media (max-width: 767px) {
+  .radio-group {
+    flex-direction: column;
+  }
+  
+  .radio-btn {
+    width: 100%;
+    justify-content: flex-start; /* スマホでは左寄せで整列 */
+    padding: 10px 14px;
+  }
+}
+
+/* デザイン選択グリッドの整理 */
+.design-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2列で均等配置 */
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+/* カスタム背景調整エリアの独立カード化 */
+.bg-custom-panel {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  margin-bottom: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.input-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 2x2 カラーピッカーグリッド */
+.color-picker-grid-2x2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+}
+
+.color-control-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.color-control-item input[type="color"] {
+  width: 100%;
+  height: 42px;
+  padding: 0;
+  border: 1px solid #475569;
+  border-radius: 6px;
+  cursor: pointer;
+  background: none;
+}
+
+label {
+  font-size: 0.85rem;
+  color: #cbd5e1;
+}
+
+input[type="text"], select, input[type="file"] {
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid #475569;
+  background: #0f172a;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.slider-group {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.slider-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* ラベルと数値入力欄の美観調整 */
+.slider-label-wrap {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2px;
+}
+
+.num-input {
+  width: 65px !important;
+  padding: 2px 6px !important;
+  font-size: 0.85rem !important;
+  text-align: right;
+  background: #1e293b !important;
+  border: 1px solid #475569 !important;
+  border-radius: 4px !important;
+  color: #38bdf8 !important;
+  font-weight: bold;
+  -moz-appearance: textfield;
+}
+
+.num-input::-webkit-inner-spin-button,
+.num-input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.schedule-input-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.schedule-input-row .day-label {
+  width: 50px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  color: #38bdf8;
+}
+
+.schedule-input-row input.time-input {
+  width: 90px;
+}
+
+.schedule-input-row input.content-input {
+  flex: 1;
+}
+
+/* ピックアップの削除・追加ボタン */
+.remove-btn {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.remove-btn:hover {
+  background: #dc2626;
+}
+
+.add-item-btn {
+  width: 100%;
+  background: #0f172a;
+  color: #38bdf8;
+  border: 1px dashed #38bdf8;
+  padding: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  margin-top: 6px;
+  transition: background 0.2s;
+}
+
+.add-item-btn:hover {
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.download-btn {
+  background: linear-gradient(135deg, #0284c7, #2563eb);
+  color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* PC表示時（1024px以上）のプレビュー領域 */
+.preview-sticky {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #334155;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* キャンバスラッパー（相対配置にしてボタンを重ねる） */
+.canvas-wrapper {
+  position: relative; /* 虫眼鏡ボタンの位置基準 */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #000;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+  max-width: 100%;
+  max-height: 550px;
+  width: fit-content;
+}
+
+.canvas-wrapper.ratio-16-9 {
+  aspect-ratio: 16 / 9;
+}
+.canvas-wrapper.ratio-4-5 {
+  aspect-ratio: 4 / 5;
+}
+.canvas-wrapper.ratio-1-1 {
+  aspect-ratio: 1 / 1;
+}
+
+/* 右上の丸い虫眼鏡アイコンボタン */
+.zoom-icon-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 10;
+  background: rgba(15, 23, 42, 0.75);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  transition: transform 0.2s, background 0.2s;
+}
+
+.zoom-icon-btn:active {
+  transform: scale(0.9);
+  background: rgba(56, 189, 248, 0.9);
+}
+
+#schedule-canvas {
+  display: block;
+  max-width: 100%;
+  max-height: 550px;
+  width: auto !important;
+  height: auto !important;
+  object-fit: contain;
+}
+
+/* 拡大モーダルのスタイル */
+.zoom-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.9);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px; /* パディングを極小にして横幅を確保 */
+  box-sizing: border-box;
+}
+
+.zoom-modal-content {
+  position: relative;
+  width: 100vw; /* 横幅を画面の98%まで広げる */
+  max-width: 100vw;
+  max-height: 96vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 閉じるボタンをシックなダークグレーに変更 */
+.zoom-close-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10000;
+  background: rgba(30, 41, 59, 0.85); /* ダークグレー半透明 */
+  color: #cbd5e1;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  transition: background 0.2s, color 0.2s;
+}
+
+.zoom-close-btn:hover {
+  background: rgba(51, 65, 85, 0.95);
+  color: #ffffff;
+}
+
+.zoom-canvas-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.zoom-canvas-container img {
+  width: auto; /* 横幅100%指定 */
+  max-width: 90vw;
+  max-height: 85vh; /* 縦も画面からはみ出さない上限 */
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  object-fit: contain; /* 縦横比を崩さずフィット */
+  display: block;
+  margin: 0 auto;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/* ピックアップのセクション分割ボックス */
+.pickup-section-box {
+  background: #0f172a;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid #334155;
+  margin-bottom: 12px;
+}
+
+.pickup-section-box.undecided-box {
+  border: 1px dashed #ff007f; /* 未定枠は点線とアクセント色で区別 */
+  background: rgba(255, 0, 127, 0.05);
+}
+
+.sub-section-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: #38bdf8;
+  margin-bottom: 8px;
+  display: block;
+}
+
+.sub-section-title.accent-text {
+  color: #ff007f;
+}
+
+.undecided-add-btn {
+  color: #ff007f !important;
+  border-color: #ff007f !important;
+}
+
+.undecided-add-btn:hover {
+  background: rgba(255, 0, 127, 0.15) !important;
+}
